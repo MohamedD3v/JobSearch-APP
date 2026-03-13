@@ -3,25 +3,7 @@ import mongoose, { Document, HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
-export enum Providers {
-  GOOGLE = 'google',
-  SYSTEM = 'system',
-}
-
-export enum Genders {
-  MALE = 'Male',
-  FEMALE = 'Female',
-}
-
-export enum Roles {
-  USER = 'User',
-  ADMIN = 'Admin',
-}
-
-export enum OTPTypes {
-  CONFIRM_EMAIL = 'confirmEmail',
-  FORGET_PASSWORD = 'forgetPassword',
-}
+import { Providers, Genders, Roles, OTPTypes } from '../../common/enums/enums';
 
 @Schema({ _id: false })
 export class OTP {
@@ -122,6 +104,30 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre('deleteOne', { document: true, query: true }, async function () {
+  try {
+    let userId: mongoose.Types.ObjectId | string | undefined;
+
+    if (this instanceof mongoose.Query) {
+      const query = this as mongoose.Query<unknown, unknown>;
+      const filter = query.getQuery() as {
+        _id?: mongoose.Types.ObjectId | string;
+      };
+      userId = filter._id;
+    } else {
+      const doc = this as unknown as UserDocument;
+      userId = doc._id;
+    }
+
+    if (userId) {
+      const CompanyModel = mongoose.model('Company');
+      await CompanyModel.deleteMany({ CreatedBy: userId });
+    }
+  } catch (error) {
+    console.error('Error cascading delete for companies:', error);
+  }
+});
 
 UserSchema.virtual('username').get(function (this: UserDocument) {
   return `${this.firstName} ${this.lastName}`;
