@@ -12,7 +12,7 @@ export class FileAttachment {
   @Prop({ required: true })
   public_id: string;
 }
-const FileAttachmentSchema = SchemaFactory.createForClass(FileAttachment);
+const fileAttachmentSchema = SchemaFactory.createForClass(FileAttachment);
 
 @Schema({ timestamps: true })
 export class Company {
@@ -37,10 +37,10 @@ export class Company {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   CreatedBy: User | mongoose.Types.ObjectId;
 
-  @Prop({ type: FileAttachmentSchema })
+  @Prop({ type: fileAttachmentSchema })
   Logo?: FileAttachment;
 
-  @Prop({ type: FileAttachmentSchema })
+  @Prop({ type: fileAttachmentSchema })
   coverPic?: FileAttachment;
 
   @Prop({
@@ -55,7 +55,7 @@ export class Company {
   @Prop({ type: Date })
   deletedAt?: Date;
 
-  @Prop({ type: FileAttachmentSchema })
+  @Prop({ type: fileAttachmentSchema })
   legalAttachment?: FileAttachment;
 
   @Prop({ default: false })
@@ -63,3 +63,17 @@ export class Company {
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
+
+CompanySchema.pre('findOneAndDelete', async function () {
+  try {
+    const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
+    const companyId = query._id;
+
+    if (companyId) {
+      const JobModel = mongoose.model('Job');
+      await JobModel.deleteMany({ companyId });
+    }
+  } catch (error) {
+    console.error('Error cascading delete for jobs:', error);
+  }
+});

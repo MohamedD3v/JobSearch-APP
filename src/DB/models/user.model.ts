@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { sendEmail } from '../../common/utils/email/send.email';
+import { template } from '../../common/utils/email/template.email';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -11,7 +13,7 @@ export class OTP {
   code: string;
 
   @Prop({ required: true, enum: OTPTypes })
-  type: string;
+  type: OTPTypes;
 
   @Prop({ required: true, type: Date })
   expiresIn: Date;
@@ -43,10 +45,10 @@ export class User {
   password?: string;
 
   @Prop({ enum: Providers, required: true })
-  provider: string;
+  provider: Providers;
 
   @Prop({ enum: Genders })
-  gender?: string;
+  gender?: Genders;
 
   @Prop({
     type: Date,
@@ -76,7 +78,7 @@ export class User {
   mobileNumber?: string;
 
   @Prop({ enum: Roles, default: Roles.USER })
-  role: string;
+  role: Roles;
 
   @Prop({ default: false })
   isConfirmed: boolean;
@@ -105,20 +107,17 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.pre('deleteOne', { document: true, query: true }, async function () {
-  try {
-    let userId: mongoose.Types.ObjectId | string | undefined;
+UserSchema.virtual('username').get(function (this: UserDocument) {
+  return `${this.firstName} ${this.lastName}`;
+});
 
-    if (this instanceof mongoose.Query) {
-      const query = this as mongoose.Query<unknown, unknown>;
-      const filter = query.getQuery() as {
-        _id?: mongoose.Types.ObjectId | string;
-      };
-      userId = filter._id;
-    } else {
-      const doc = this as unknown as UserDocument;
-      userId = doc._id;
-    }
+UserSchema.set('toJSON', { virtuals: true });
+UserSchema.set('toObject', { virtuals: true });
+
+UserSchema.pre('findOneAndDelete', async function () {
+  try {
+    const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
+    const userId = query._id;
 
     if (userId) {
       const CompanyModel = mongoose.model('Company');
@@ -129,9 +128,30 @@ UserSchema.pre('deleteOne', { document: true, query: true }, async function () {
   }
 });
 
-UserSchema.virtual('username').get(function (this: UserDocument) {
-  return `${this.firstName} ${this.lastName}`;
-});
+type DocWithOtpCode = UserDocument & { _otpCode?: string };
 
-UserSchema.set('toJSON', { virtuals: true });
-UserSchema.set('toObject', { virtuals: true });
+UserSchema.post('save', async function (doc: DocWithOtpCode) {
+  const otpCode = doc._otpCode;
+  if (!otpCode) return;
+
+  const hasConfirmOtp = doc.OTP.some((o) => o.type === OTPTypes.CONFIRM_EMAIL);
+  const hasForgetOtp = doc.OTP.some((o) => o.type === OTPTypes.FORGET_PASSWORD);
+
+  if (hasConfirmOtp) {
+    const subject = 'Job Search App - Email Verification';
+    await sendEmail({
+      to: doc.email,
+      subject,
+      html: template(Number(otpCode), doc.firstName, subject),
+    });
+  } else if (hasForgetOtp) {
+    const subject = 'Job Search App - Password Reset';
+    await sendEmail({
+      to: doc.email,
+      subject,
+      html: template(Number(otpCode), doc.firstName, subject),
+    });
+  }
+
+  doc._otpCode = undefined;
+});
