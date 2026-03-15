@@ -19,9 +19,5 @@ export const verifyToken = ({
   token: string;
   signature?: string;
 }): any => {
-  try {
-    return jwt.verify(token, signature);
-  } catch {
-    return null;
-  }
+  return jwt.verify(token, signature);
 };

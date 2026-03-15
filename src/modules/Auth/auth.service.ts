@@ -253,47 +253,41 @@ export class AuthService {
   }
 
   async refreshToken(refreshTokenDto: RefreshTokenDto) {
-    try {
-      const decoded = verifyToken({
-        token: refreshTokenDto.refreshToken,
-        signature: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-      }) as {
-        _id: string;
-        role: string;
-        iat: number;
-      };
+    const decoded = verifyToken({
+      token: refreshTokenDto.refreshToken,
+      signature: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+    }) as {
+      _id: string;
+      role: string;
+      iat: number;
+    };
 
-      if (!decoded) throw new UnauthorizedException('Invalid token');
-      const user = await this.userModel.findById(decoded._id);
+    if (!decoded) throw new UnauthorizedException('Invalid token');
+    const user = await this.userModel.findById(decoded._id);
 
-      if (!user) throw new UnauthorizedException('Invalid token');
+    if (!user) throw new UnauthorizedException('Invalid token');
 
-      if (user.changeCredentialTime) {
-        const changeTime = parseInt(
-          (user.changeCredentialTime.getTime() / 1000).toString(),
-          10,
-        );
-        if (decoded.iat < changeTime) {
-          throw new UnauthorizedException(
-            'Token expired due to password change',
-          );
-        }
+    if (user.changeCredentialTime) {
+      const changeTime = parseInt(
+        (user.changeCredentialTime.getTime() / 1000).toString(),
+        10,
+      );
+      if (decoded.iat < changeTime) {
+        throw new UnauthorizedException('Token expired due to password change');
       }
-
-      const accessToken = generateToken({
-        payload: { _id: user._id, role: user.role },
-        signature: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
-        options: {
-          expiresIn: this.configService.get<string>(
-            'ACCESS_TOKEN_EXPIRES',
-          ) as any,
-        },
-      });
-
-      return { accessToken };
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
     }
+
+    const accessToken = generateToken({
+      payload: { _id: user._id, role: user.role },
+      signature: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
+      options: {
+        expiresIn: this.configService.get<string>(
+          'ACCESS_TOKEN_EXPIRES',
+        ) as any,
+      },
+    });
+
+    return { accessToken };
   }
 
   async resendOtp(resendOtpDto: ResendOtpDto) {

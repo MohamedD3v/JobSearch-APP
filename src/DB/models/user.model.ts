@@ -2,10 +2,15 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { sendEmail } from '../../common/utils/email/send.email';
 import { template } from '../../common/utils/email/template.email';
+import {
+  encrypt,
+  decrypt,
+} from '../../common/utils/encryption/encryption.util';
 
 export type UserDocument = HydratedDocument<User>;
 
 import { Providers, Genders, Roles, OTPTypes } from '../../common/enums/enums';
+import { hash } from '../../common/utils/encryption/hash';
 
 @Schema({ _id: false })
 export class OTP {
@@ -114,17 +119,41 @@ UserSchema.virtual('username').get(function (this: UserDocument) {
 UserSchema.set('toJSON', { virtuals: true });
 UserSchema.set('toObject', { virtuals: true });
 
-UserSchema.pre('findOneAndDelete', async function () {
-  try {
-    const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
-    const userId = query._id;
+UserSchema.pre('save', async function () {
+  if (this.isModified('password') && this.password) {
+    const salt = Number(process.env.SALT) || 10;
+    this.password = await hash(this.password, salt);
+  }
+});
 
-    if (userId) {
-      const CompanyModel = mongoose.model('Company');
-      await CompanyModel.deleteMany({ CreatedBy: userId });
+UserSchema.pre('save', async function () {
+  if (this.isModified('mobileNumber') && this.mobileNumber) {
+    const secret = process.env.ENCRYPTION_KEY;
+    if (secret) {
+      this.mobileNumber = encrypt(this.mobileNumber, secret);
     }
-  } catch (error) {
-    console.error('Error cascading delete for companies:', error);
+  }
+});
+
+UserSchema.post('findOne', function (doc) {
+  if (doc && doc.mobileNumber) {
+    const secret = process.env.ENCRYPTION_KEY;
+    if (secret) {
+      doc.mobileNumber = decrypt(doc.mobileNumber as string, secret);
+    }
+  }
+});
+
+UserSchema.post('find', function (docs) {
+  if (docs && Array.isArray(docs)) {
+    const secret = process.env.ENCRYPTION_KEY;
+    if (secret) {
+      docs.forEach((doc) => {
+        if (doc.mobileNumber) {
+          doc.mobileNumber = decrypt(doc.mobileNumber as string, secret);
+        }
+      });
+    }
   }
 });
 

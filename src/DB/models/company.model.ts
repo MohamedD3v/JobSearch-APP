@@ -65,15 +65,11 @@ export class Company {
 export const CompanySchema = SchemaFactory.createForClass(Company);
 
 CompanySchema.pre('findOneAndDelete', async function () {
-  try {
-    const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
-    const companyId = query._id;
+  const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
+  const companyId = query._id;
 
-    if (companyId) {
-      const JobModel = mongoose.model('Job');
-      await JobModel.deleteMany({ companyId });
-    }
-  } catch (error) {
-    console.error('Error cascading delete for jobs:', error);
+  if (companyId) {
+    const JobModel = mongoose.model('Job');
+    await JobModel.deleteMany({ companyId });
   }
 });
