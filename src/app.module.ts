@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/Auth/auth.module';
 import { UserModule } from './modules/User/user.module';
+import { CompanyModule } from './modules/Company/company.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserModule } from './modules/User/user.module';
     EventEmitterModule.forRoot(),
     AuthModule,
     UserModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

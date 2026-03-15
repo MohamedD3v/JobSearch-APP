@@ -64,6 +64,15 @@ export class Company {
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
 
+CompanySchema.virtual('jobs', {
+  ref: 'Job',
+  localField: '_id',
+  foreignField: 'companyId',
+});
+
+CompanySchema.set('toObject', { virtuals: true });
+CompanySchema.set('toJSON', { virtuals: true });
+
 CompanySchema.pre('findOneAndDelete', async function () {
   const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
   const companyId = query._id;
