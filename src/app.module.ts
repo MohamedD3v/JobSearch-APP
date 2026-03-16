@@ -12,6 +12,7 @@ import { ApplicationModule } from './modules/Application/application.module';
 import { SocketModule } from './modules/Socket/socket.module';
 import { EmailModule } from './common/services/email.module';
 import { CloudinaryModule } from './common/services/cloudinary.module';
+import { ChatModule } from './modules/Chat/chat.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CloudinaryModule } from './common/services/cloudinary.module';
     JobModule,
     ApplicationModule,
     SocketModule,
+    ChatModule,
     EmailModule,
     CloudinaryModule,
   ],

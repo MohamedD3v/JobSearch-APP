@@ -16,10 +16,9 @@ export const sendEmail = async (data: MailOptions) => {
       pass: process.env.PASS,
     },
   });
-  const info = await transporter.sendMail({
+  await transporter.sendMail({
     ...data,
     from: `"Job Search App" <${process.env.EMAIL}>`,
     to: data.to,
   });
-  console.log(`Message Sent To ${info.messageId}`);
 };

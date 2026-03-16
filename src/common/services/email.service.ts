@@ -26,10 +26,8 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`Email sent to ${to}`);
       return true;
-    } catch (error) {
-      console.error('Email sending failed:', error.message);
+    } catch {
       return false;
     }
   }

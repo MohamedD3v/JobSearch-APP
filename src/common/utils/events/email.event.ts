@@ -13,15 +13,11 @@ export const emailEvent = new EventEmitter();
 emailEvent.on('confirmEmail', (data: EmailEventData) => {
   const subject = 'Job Search App - Email Verification';
   const html = template(Number(data.otp), data.firstName, subject);
-  sendEmail({ to: data.to, subject, html }).catch((error: unknown) => {
-    console.error('Send email failed:', error);
-  });
+  sendEmail({ to: data.to, subject, html }).catch(() => {});
 });
 
 emailEvent.on('forgetPassword', (data: EmailEventData) => {
   const subject = 'Job Search App - Password Reset';
   const html = template(Number(data.otp), data.firstName, subject);
-  sendEmail({ to: data.to, subject, html }).catch((error: unknown) => {
-    console.error('Send email failed:', error);
-  });
+  sendEmail({ to: data.to, subject, html }).catch(() => {});
 });
