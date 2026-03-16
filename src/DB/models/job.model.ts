@@ -2,28 +2,31 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from './user.model';
 import { Company } from './company.model';
-
-export type JobDocument = HydratedDocument<Job>;
-
 import {
   JobLocation,
   WorkingTime,
   SeniorityLevel,
 } from '../../common/enums/enums';
 
-@Schema({ timestamps: true })
+export type JobDocument = HydratedDocument<Job>;
+
+@Schema({
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class Job {
   @Prop({ required: true })
   jobTitle: string;
 
-  @Prop({ required: true, enum: Object.values(JobLocation) })
-  jobLocation: string;
+  @Prop({ required: true, enum: JobLocation })
+  jobLocation: JobLocation;
 
-  @Prop({ required: true, enum: Object.values(WorkingTime) })
-  workingTime: string;
+  @Prop({ required: true, enum: WorkingTime })
+  workingTime: WorkingTime;
 
-  @Prop({ required: true, enum: Object.values(SeniorityLevel) })
-  seniorityLevel: string;
+  @Prop({ required: true, enum: SeniorityLevel })
+  seniorityLevel: SeniorityLevel;
 
   @Prop({ required: true })
   jobDescription: string;
@@ -37,12 +40,6 @@ export class Job {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   addedBy: User | mongoose.Types.ObjectId;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  updatedBy: User | mongoose.Types.ObjectId;
-
-  @Prop({ default: false })
-  closed: boolean;
-
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Company',
@@ -52,3 +49,9 @@ export class Job {
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job);
+
+JobSchema.virtual('applications', {
+  ref: 'Application',
+  localField: '_id',
+  foreignField: 'jobId',
+});

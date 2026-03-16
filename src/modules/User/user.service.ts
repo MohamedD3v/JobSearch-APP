@@ -4,38 +4,20 @@ import {
   BadRequestException,
   OnModuleInit,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from '../../DB/models/user.model';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryService } from '../../common/services/cloudinary.service';
 
 @Injectable()
 export class UserService implements OnModuleInit {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private configService: ConfigService,
-  ) {
-    cloudinary.config({
-      cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME'),
-      api_key: this.configService.get<string>('CLOUDINARY_API_KEY'),
-      api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET'),
-    });
-  }
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
-  async onModuleInit() {
-    await this.checkCloudinary();
-  }
-
-  async checkCloudinary() {
-    try {
-      await cloudinary.api.ping();
-      console.log('Cloudinary connection: OK');
-    } catch (error) {
-      console.error('Cloudinary connection error:', error.message);
-    }
-  }
+  async onModuleInit() {}
 
   async getProfile(userId: string) {
     const user = await this.userModel.findById(userId);
@@ -79,16 +61,14 @@ export class UserService implements OnModuleInit {
     const user = await this.userModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
-
     if (user.profilePic?.public_id) {
-      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      await this.cloudinaryService.deleteFile(user.profilePic.public_id);
     }
 
-    const uploadResult = await cloudinary.uploader.upload(dataURI, {
-      folder: 'job-search/profile',
-    });
+    const uploadResult = await this.cloudinaryService.uploadFile(
+      file,
+      'profile',
+    );
     user.profilePic = {
       secure_url: uploadResult.secure_url,
       public_id: uploadResult.public_id,
@@ -105,7 +85,7 @@ export class UserService implements OnModuleInit {
     if (!user) throw new NotFoundException('User not found');
 
     if (user.profilePic?.public_id) {
-      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      await this.cloudinaryService.deleteFile(user.profilePic.public_id);
       user.profilePic = undefined;
       await user.save();
     }
@@ -117,16 +97,11 @@ export class UserService implements OnModuleInit {
     const user = await this.userModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
-
     if (user.coverPic?.public_id) {
-      await cloudinary.uploader.destroy(user.coverPic.public_id);
+      await this.cloudinaryService.deleteFile(user.coverPic.public_id);
     }
 
-    const uploadResult = await cloudinary.uploader.upload(dataURI, {
-      folder: 'job-search/cover',
-    });
+    const uploadResult = await this.cloudinaryService.uploadFile(file, 'cover');
     user.coverPic = {
       secure_url: uploadResult.secure_url,
       public_id: uploadResult.public_id,
@@ -143,7 +118,7 @@ export class UserService implements OnModuleInit {
     if (!user) throw new NotFoundException('User not found');
 
     if (user.coverPic?.public_id) {
-      await cloudinary.uploader.destroy(user.coverPic.public_id);
+      await this.cloudinaryService.deleteFile(user.coverPic.public_id);
       user.coverPic = undefined;
       await user.save();
     }

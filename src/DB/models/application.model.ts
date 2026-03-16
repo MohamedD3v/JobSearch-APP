@@ -1,11 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Job } from './job.model';
 import { User } from './user.model';
+import { Job } from './job.model';
+import { ApplicationStatus } from '../../common/enums/enums';
 
 export type ApplicationDocument = HydratedDocument<Application>;
-
-import { ApplicationStatus } from '../../common/enums/enums';
 
 @Schema({ timestamps: true })
 export class Application {
@@ -22,13 +21,17 @@ export class Application {
     },
     required: true,
   })
-  userCV: { secure_url: string; public_id: string };
+  userCV: {
+    secure_url: string;
+    public_id: string;
+  };
 
   @Prop({
-    enum: Object.values(ApplicationStatus),
+    type: String,
+    enum: ApplicationStatus,
     default: ApplicationStatus.PENDING,
   })
-  status: string;
+  status: ApplicationStatus;
 }
 
 export const ApplicationSchema = SchemaFactory.createForClass(Application);

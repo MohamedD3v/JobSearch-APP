@@ -7,6 +7,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/Auth/auth.module';
 import { UserModule } from './modules/User/user.module';
 import { CompanyModule } from './modules/Company/company.module';
+import { JobModule } from './modules/Job/job.module';
+import { ApplicationModule } from './modules/Application/application.module';
+import { SocketModule } from './modules/Socket/socket.module';
+import { EmailModule } from './common/services/email.module';
+import { CloudinaryModule } from './common/services/cloudinary.module';
 
 @Module({
   imports: [
@@ -25,6 +30,11 @@ import { CompanyModule } from './modules/Company/company.module';
     AuthModule,
     UserModule,
     CompanyModule,
+    JobModule,
+    ApplicationModule,
+    SocketModule,
+    EmailModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -10,22 +10,15 @@ import { Model } from 'mongoose';
 import { Company, CompanyDocument } from '../../DB/models/company.model';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryService } from '../../common/services/cloudinary.service';
 import { Roles } from '../../common/enums/enums';
 
 @Injectable()
 export class CompanyService {
   constructor(
     @InjectModel(Company.name) private companyModel: Model<CompanyDocument>,
-    private configService: ConfigService,
-  ) {
-    cloudinary.config({
-      cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME'),
-      api_key: this.configService.get<string>('CLOUDINARY_API_KEY'),
-      api_secret: this.configService.get<string>('CLOUDINARY_API_SECRET'),
-    });
-  }
+    private cloudinaryService: CloudinaryService,
+  ) {}
 
   async createCompany(createCompanyDto: CreateCompanyDto, userId: string) {
     const { companyName, companyEmail } = createCompanyDto;
@@ -98,16 +91,14 @@ export class CompanyService {
       throw new ForbiddenException('Only the owner can manage the logo');
     }
 
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
-
     if (company.Logo?.public_id) {
-      await cloudinary.uploader.destroy(company.Logo.public_id);
+      await this.cloudinaryService.deleteFile(company.Logo.public_id);
     }
 
-    const uploadResult = await cloudinary.uploader.upload(dataURI, {
-      folder: 'job-search/company/logo',
-    });
+    const uploadResult = await this.cloudinaryService.uploadFile(
+      file,
+      'company/logo',
+    );
 
     company.Logo = {
       secure_url: uploadResult.secure_url,
@@ -127,7 +118,7 @@ export class CompanyService {
     }
 
     if (company.Logo?.public_id) {
-      await cloudinary.uploader.destroy(company.Logo.public_id);
+      await this.cloudinaryService.deleteFile(company.Logo.public_id);
       company.Logo = undefined;
       await company.save();
     }
@@ -145,16 +136,14 @@ export class CompanyService {
       );
     }
 
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
-
     if (company.coverPic?.public_id) {
-      await cloudinary.uploader.destroy(company.coverPic.public_id);
+      await this.cloudinaryService.deleteFile(company.coverPic.public_id);
     }
 
-    const uploadResult = await cloudinary.uploader.upload(dataURI, {
-      folder: 'job-search/company/cover',
-    });
+    const uploadResult = await this.cloudinaryService.uploadFile(
+      file,
+      'company/cover',
+    );
 
     company.coverPic = {
       secure_url: uploadResult.secure_url,
@@ -179,7 +168,7 @@ export class CompanyService {
     }
 
     if (company.coverPic?.public_id) {
-      await cloudinary.uploader.destroy(company.coverPic.public_id);
+      await this.cloudinaryService.deleteFile(company.coverPic.public_id);
       company.coverPic = undefined;
       await company.save();
     }
