@@ -143,4 +143,30 @@ export class ApplicationService {
       application,
     };
   }
+
+  async getApplicationsForExcel(companyId: string, date: string) {
+    if (!date || isNaN(new Date(date).getTime())) {
+      throw new BadRequestException(
+        'Invalid date provided. Please provide a valid date string (e.g., YYYY-MM-DD).',
+      );
+    }
+    const jobs = await this.jobModel.find({ companyId });
+    const jobIds = jobs.map((job) => job._id);
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const applications = await this.applicationModel
+      .find({
+        jobId: { $in: jobIds },
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+      })
+      .populate('userId', 'firstName lastName email')
+      .populate('jobId', 'jobTitle');
+
+    return applications;
+  }
 }

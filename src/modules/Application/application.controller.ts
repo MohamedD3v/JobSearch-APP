@@ -10,7 +10,9 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { ApplicationService } from './application.service';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { AuthGuard } from '../../common/guards/auth.guard';
@@ -63,5 +65,37 @@ export class ApplicationController {
       req.user._id as string,
       updateStatusDto,
     );
+  }
+
+  @Get('applications/excel-export')
+  async exportApplicationsToCsv(
+    @Query('companyId') companyId: string,
+    @Query('date') date: string,
+    @Res() res: Response,
+  ) {
+    const applications = await this.applicationService.getApplicationsForExcel(
+      companyId,
+      date,
+    );
+
+    let csvString = 'Applicant Name,Email,Job Title,Status,Applied At\n';
+
+    applications.forEach((app: any) => {
+      const applicantName = `${app.userId.firstName} ${app.userId.lastName}`;
+      const email = app.userId.email;
+      const jobTitle = app.jobId.jobTitle;
+      const status = app.status;
+      const appliedAt = app.createdAt.toISOString();
+
+      csvString += `${applicantName},${email},${jobTitle},${status},${appliedAt}\n`;
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=applications_report.csv',
+    );
+
+    return res.status(200).send(csvString);
   }
 }

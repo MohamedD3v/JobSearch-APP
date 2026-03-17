@@ -7,13 +7,22 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { verifyToken } from '../utils/token/token.util';
 
+import { GqlExecutionContext } from '@nestjs/graphql';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private configService: ConfigService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const authorization = request.headers.authorization;
+    let request;
+    if (context.getType().toString() === 'graphql') {
+      const gqlContext = GqlExecutionContext.create(context);
+      request = gqlContext.getContext().req;
+    } else {
+      request = context.switchToHttp().getRequest();
+    }
+
+    const authorization = request?.headers?.authorization;
 
     if (!authorization || !authorization.startsWith('Bearer ')) {
       throw new UnauthorizedException('Authorization header is missing');

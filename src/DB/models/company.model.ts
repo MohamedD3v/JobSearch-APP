@@ -49,8 +49,11 @@ export class Company {
   })
   HRs: (User | mongoose.Types.ObjectId)[];
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, default: null })
   bannedAt?: Date;
+
+  @Prop({ default: false })
+  isApproved: boolean;
 
   @Prop({ type: Date })
   deletedAt?: Date;
@@ -73,12 +76,10 @@ CompanySchema.virtual('jobs', {
 CompanySchema.set('toObject', { virtuals: true });
 CompanySchema.set('toJSON', { virtuals: true });
 
-CompanySchema.pre('findOneAndDelete', async function () {
-  const query = this.getQuery() as { _id?: mongoose.Types.ObjectId };
-  const companyId = query._id;
-
-  if (companyId) {
+CompanySchema.pre(['findOneAndDelete', 'deleteOne'], async function () {
+  const company = await this.model.findOne(this.getQuery());
+  if (company) {
     const JobModel = mongoose.model('Job');
-    await JobModel.deleteMany({ companyId });
+    await JobModel.deleteMany({ companyId: company._id });
   }
 });

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/Auth/auth.module';
@@ -13,6 +12,11 @@ import { SocketModule } from './modules/Socket/socket.module';
 import { EmailModule } from './common/services/email.module';
 import { CloudinaryModule } from './common/services/cloudinary.module';
 import { ChatModule } from './modules/Chat/chat.module';
+
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { AdminModule } from './modules/Admin/admin.module';
 
 @Module({
   imports: [
@@ -27,7 +31,10 @@ import { ChatModule } from './modules/Chat/chat.module';
       }),
       inject: [ConfigService],
     }),
-    EventEmitterModule.forRoot(),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
     AuthModule,
     UserModule,
     CompanyModule,
@@ -37,6 +44,7 @@ import { ChatModule } from './modules/Chat/chat.module';
     ChatModule,
     EmailModule,
     CloudinaryModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

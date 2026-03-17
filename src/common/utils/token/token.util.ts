@@ -2,7 +2,7 @@ import * as jwt from 'jsonwebtoken';
 
 export const generateToken = ({
   payload,
-  signature = process.env.JWT_SECRET || 'secret',
+  signature = process.env.JWT_SECRET,
   options = {},
 }: {
   payload: object;
@@ -14,7 +14,7 @@ export const generateToken = ({
 
 export const verifyToken = ({
   token,
-  signature = process.env.JWT_SECRET || 'secret',
+  signature = process.env.JWT_SECRET,
 }: {
   token: string;
   signature?: string;

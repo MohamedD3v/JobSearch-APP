@@ -55,3 +55,11 @@ JobSchema.virtual('applications', {
   localField: '_id',
   foreignField: 'jobId',
 });
+
+JobSchema.pre(['findOneAndDelete', 'deleteOne'], async function () {
+  const job = await this.model.findOne(this.getQuery());
+  if (job) {
+    const ApplicationModel = mongoose.model('Application');
+    await ApplicationModel.deleteMany({ jobId: job._id });
+  }
+});

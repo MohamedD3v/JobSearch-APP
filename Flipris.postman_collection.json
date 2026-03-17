@@ -1,0 +1,1490 @@
+{
+  "info": {
+    "_postman_id": "b420c868-e0ff-4105-b545-44393e52fee7",
+    "name": "JobSearch",
+    "description": "# Postman Collection Documentation - Flipris JobSearch APP\n\nUse the descriptions below to document your Postman collection. Each entry includes the **Goal**, **Headers**, and **Query Parameters** where applicable.\n\n---\n\n## 🔐 1. Auth Module\n\n### **Signup**\n\n**Goal:** Register a new user account. **Headers:** None. **Body:** `firstName`, `lastName`, `email`, `password`, `gender`, `DOB`, `mobileNumber`.\n\n### **Confirm OTP**\n\n**Goal:** Verify email address using the code sent during signup. **Headers:** None. **Body:** `email`, `otpCode`.\n\n### **SignIn**\n\n**Goal:** Authenticate user and receive Access & Refresh tokens. **Headers:** None. **Body:** `email`, `password`.\n\n### **Google Signup/Login**\n\n**Goal:** Authenticate using Google OAuth token. **Headers:** None. **Body:** `idToken`.\n\n### **Forget Password**\n\n**Goal:** Trigger a password reset OTP to be sent to the user's email. **Headers:** None. **Body:** `email`.\n\n### **Reset Password**\n\n**Goal:** Set a new password using the OTP received from \"Forget Password\". **Headers:** None. **Body:** `email`, `otpCode`, `newPassword`.\n\n### **Refresh Token**\n\n**Goal:** Obtain a new Access Token using a valid Refresh Token. **Headers:** None. **Body:** \n\nrefreshToken.\n\n### **Update Password**\n\n**Goal:** Change the password for the currently logged-in user. **Headers:** `Authorization: Bearer`  **Body:** `oldPassword`, `newPassword`.\n\n---\n\n## 🏢 2. Company Module\n\n### **Create Company**\n\n**Goal:** Registers a new company (Only Users can create companies). **Headers:** `Authorization: Bearer`  **Body:** `companyName`, `description`, `industry`, `address`, `numberOfEmployees`, `companyEmail`.\n\n### **Update Company**\n\n**Goal:** Update company details (Only Company Owner can perform this). **Headers:** `Authorization: Bearer`  **Path Param:** \n\nid (Company ID)\n\n### **Soft Delete Company**\n\n**Goal:** Deactivates a company (Owner/Admin only). **Headers:** `Authorization: Bearer`  **Path Param:** \n\nid\n\n### **Search Company**\n\n**Goal:** Find companies by name. **Query Params:** `name` (String)\n\n### **Upload Logo / Cover**\n\n**Goal:** Upload company media to Cloudinary. **Headers:** `Authorization: Bearer`  **Body:** `multipart/form-data` (key: `logo` or `cover`)\n\n---\n\n## 💼 3. Job Module\n\n### **Add Job**\n\n**Goal:** Post a new job opening (Owner/HR only). **Headers:** `Authorization: Bearer`  **Body:** `jobTitle`, `jobLocation`, `workingTime`, `seniorityLevel`, `jobDescription`, `technicalSkills`, `softSkills`.\n\n### **Get All Jobs**\n\n**Goal:** Fetch all active jobs with advanced filtering. **Query Params:**\n\n- `skip`, `limit`, `sort`\n    \n- `companyName`, `workingTime`, `jobLocation`, `seniorityLevel`, `jobTitle`, `technicalSkills`.\n    \n\n### **Get Company Jobs**\n\n**Goal:** Fetch jobs for a specific company. **Path Param:** `companyId` **Query Params:** Same as Get All Jobs.\n\n---\n\n## 📩 4. Application Module\n\n### **Apply to Job**\n\n**Goal:** Submit an application with a CV (Users only). **Headers:** `Authorization: Bearer`  **Body:** `multipart/form-data` (key: `cv`) **Path Param:** `jobId`\n\n### **Get Job Applications**\n\n**Goal:** View all applicants for a specific job (Owner/HR only). **Headers:** `Authorization: Bearer`  **Path Param:** `jobId` **Query Params:** `skip`, `limit`.\n\n### **Update Application Status**\n\n**Goal:** Accept or Reject an application. **Headers:** `Authorization: Bearer`  **Body:** `status` (\"accepted\" or \"rejected\")\n\n### **Excel Export**\n\n**Goal:** Download a CSV report of applications for a specific company on a specific day. **Query Params:**\n\n- `companyId` (Required)\n    \n- date (Required, Format: YYYY-MM-DD)\n    \n\n---\n\n## 🛡️ 5. Admin Module\n\n### **Ban/Unban User or Company**\n\n**Goal:** Toggle the \"Banned\" status of a user or company. **Headers:** `Authorization: Bearer`  (Admin Only)\n\n### **GraphQL Dashboard**\n\n**Goal:** Fetch comprehensive user and company data for the admin dashboard. **Headers:** `Authorization: Bearer`  (Admin Only) **Query (GraphQL):**\n\n```\ngraphqlquery {  getDashboardData {    users { _id firstName lastName email bannedAt }    companies { _id companyName bannedAt isApproved }  }}\n\n ```\n\n---\n\n## 💬 6. Chat & Socket.IO\n\n### **Get Chat History**\n\n**Goal:** Fetch previous messages with a specific user. **Headers:** `Authorization: Bearer`  **Path Param:** `userId` (Buddy ID)\n\n### **Real-time Chat (Socket.IO)**\n\n**Goal:** Real-time messaging between HR/Owner and Users. **Event:** \n\nsendMessage **Payload:** `{ \"receiverId\": \"ID\", \"message\": \"Hello\" }` **Listen Event:** `receiveMessage`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47994671",
+    "_collection_link": "https://go.postman.co/collection/47994671-b420c868-e0ff-4105-b545-44393e52fee7?source=collection_link"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "AUTH",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Mohamed\",\r\n    \"lastName\": \"Mahmoud\",\r\n    \"email\": \"hamom719@gmail.com\",\r\n    \"password\": \"Password123!\",\r\n    \"gender\": \"Male\",\r\n    \"DOB\": \"2000-01-01\",\r\n    \"mobileNumber\": \"01124400561\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "forget-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"hamom719@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forget-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "forget-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"hamom719@gmail.com\",\r\n    \"otpCode\":\"310610\",\r\n    \"newPassword\":\"password\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update-password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "authorization",
+                "value": "{{USER_ACCESS_TOKEN}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"oldPassword\":\"Password123!\",\r\n    \"newPassword\":\"password\"\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/update-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "update-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "confirmEmail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"hamom719@gmail.com\",\r\n  \"otpCode\": \"710714\" \r\n}   ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/confirm-otp",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "confirm-otp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "resend-otp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"hamom719@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/resend-otp",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "resend-otp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "signin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "if (pm.response.code === 200 || pm.response.code === 201) {\r",
+                  "    pm.environment.set(\"USER_ACCESS_TOKEN\", response.accessToken);\r",
+                  "    pm.environment.set(\"USER_REFRESH_TOKEN\", response.refreshToken);\r",
+                  "    \r",
+                  "    console.log(\"Tokens saved to Postman Environment!\");\r",
+                  "} else {\r",
+                  "    console.log(\"Request failed with status: \" + pm.response.code);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "authorization",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n   \"email\": \"hamom719@gmail.com\",\r\n    \"password\": \"password\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "signin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refresh-token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "authorization",
+                "value": "{{USER_REFRESH_TOKEN}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"{{USER_REFRESH_TOKEN}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "USER",
+      "item": [
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"01022085714\",\n  \"firstName\": \"Mohamed\",\n  \"lastName\": \"Mahmoud\",\n  \"DOB\": \"2000-01-01\",\n  \"gender\": \"Male\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Another User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/profile/69b5eb2a0a04f4a2d6fccee0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "profile",
+                "69b5eb2a0a04f4a2d6fccee0"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/account",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "account"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Profile Pic",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "81f5c884-194f-49db-89cf-4d91a19c6520",
+                  "src": "postman-cloud:///1f0b7b1f-7c7d-4b90-ab18-00fab92cceba"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/profile-pic",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "profile-pic"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Cover Pic",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "3fb33964-a417-4d1f-b634-0b8284ff127f",
+                  "src": "postman-cloud:///1f0be695-63eb-48c0-9681-522c718a9b75"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/cover-pic?",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "cover-pic"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": null,
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Profile Pic",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/profile-pic",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "profile-pic"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Cover Pic",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/cover-pic",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "user",
+                "cover-pic"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "COMPANY",
+      "item": [
+        {
+          "name": "Add Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Flipriss\",\n  \"companyEmail\": \"contactt@flipris.com\",\n  \"description\": \"Digital Assets & Domain Flipping\",\n  \"industry\": \"Tech\",\n  \"address\": \"Cairo, Egypt\",\n  \"numberOfEmployees\": \"11-50\",\n  \"HRs\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/company",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description for the company\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/company/69b7124593990409317f6bb7",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b7124593990409317f6bb7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/company/search?name=Flip",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Flip"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Company With Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/company/69b7124593990409317f6bb7",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b7124593990409317f6bb7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Company",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/company/69b7124593990409317f6bb7",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b7124593990409317f6bb7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Company Logo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "uuid": "d34a0858-4278-48c5-8089-d7f9f60a5dbc",
+                  "src": "postman-cloud:///1f0be695-63eb-48c0-9681-522c718a9b75"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/company/69b712f293990409317f6bc4/logo",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b712f293990409317f6bc4",
+                "logo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Company Cover",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cover",
+                  "type": "file",
+                  "src": "postman-cloud:///1f0b7b1f-7c7d-4b90-ab18-00fab92cceba"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/company/69b712f293990409317f6bc4/cover",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b712f293990409317f6bc4",
+                "cover"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Company Logo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/company/69b712f293990409317f6bc4/logo",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b712f293990409317f6bc4",
+                "logo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Company Cover",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/company/69b712f293990409317f6bc4/cover",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "company",
+                "69b712f293990409317f6bc4",
+                "cover"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "JOB",
+      "item": [
+        {
+          "name": "Add Job (Owner/HR)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTitle\": \"Senior Node.js Developer\",\n  \"jobLocation\": \"onsite\",\n  \"workingTime\": \"full-time\",\n  \"seniorityLevel\": \"Senior\",\n  \"jobDescription\": \"We are looking for a rockstar backend engineer.\",\n  \"technicalSkills\": [\"Node.js\", \"NestJS\", \"MongoDB\", \"TypeScript\"],\n  \"softSkills\": [\"Communication\", \"Leadership\"],\n  \"companyId\": \"69b712f293990409317f6bc4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Job (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"workingTime\": \"part-time\",\n  \"jobLocation\": \"remotely\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/69b71c66f61588983796eab1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "69b71c66f61588983796eab1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Job (HR Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/69b71c66f61588983796eab1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "69b71c66f61588983796eab1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Jobs for Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/company/69b5eb2a0a04f4a2d6fccee0?skip=0&limit=10&sort=-createdAt",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "company",
+                "69b5eb2a0a04f4a2d6fccee0"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "sort",
+                  "value": "-createdAt"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Jobs with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs?skip=0&limit=10&workingTime=full-time&jobLocation=onsite&seniorityLevel=Senior&jobTitle=Node.js&technicalSkills=NestJS",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "workingTime",
+                  "value": "full-time"
+                },
+                {
+                  "key": "jobLocation",
+                  "value": "onsite"
+                },
+                {
+                  "key": "seniorityLevel",
+                  "value": "Senior"
+                },
+                {
+                  "key": "jobTitle",
+                  "value": "Node.js"
+                },
+                {
+                  "key": "technicalSkills",
+                  "value": "NestJS"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Apply to Job (User Role)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cv",
+                  "type": "file",
+                  "uuid": "9c8ab5ee-411c-4be8-86c2-6b3a4f9d1b34",
+                  "src": "/D:/MohamedMahmoud.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/69b71c66f61588983796eab1/apply",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "69b71c66f61588983796eab1",
+                "apply"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "APPLICATION",
+      "item": [
+        {
+          "name": "Get Applications for Job (Owner/HR)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/69b71c66f61588983796eab1/applications?skip=0&limit=10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "69b71c66f61588983796eab1",
+                "applications"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Applications to excel file",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/applications/excel-export?date=2026-03-15&companyId=69b712f293990409317f6bc4",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "applications",
+                "excel-export"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-03-15",
+                  "type": "text"
+                },
+                {
+                  "key": "companyId",
+                  "value": "69b712f293990409317f6bc4",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Accept/Reject Applicant (HR Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/applications/69b71df7f61588983796eada/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "jobs",
+                "applications",
+                "69b71df7f61588983796eada",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CHAT",
+      "item": [
+        {
+          "name": "Get Chat History",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chat/69b5eb2a0a04f4a2d6fccee0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "chat",
+                "69b5eb2a0a04f4a2d6fccee0"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ADMIN DASHBOARD",
+      "item": [
+        {
+          "name": "Get Dashboard Data",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{USER_ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query {\r\n  getDashboardData {\r\n    users {\r\n      _id\r\n      firstName\r\n      lastName\r\n      email\r\n      bannedAt\r\n    }\r\n    companies {\r\n      _id\r\n      companyName\r\n      description\r\n      isApproved\r\n      bannedAt\r\n    }\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ban User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{USER_ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/69b5eb2a0a04f4a2d6fccee0/ban",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "admin",
+                "users",
+                "69b5eb2a0a04f4a2d6fccee0",
+                "ban"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request PATCH '{{baseUrl}}/admin/users/حط_أيدي_اليوزر_هنا/ban' \\\r\n--header 'Authorization: Bearer {{USER_ACCESS_TOKEN}}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Ban Company",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{USER_ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/companies/69b712f293990409317f6bc4/ban",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "admin",
+                "companies",
+                "69b712f293990409317f6bc4",
+                "ban"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request PATCH '{{baseUrl}}/admin/companies/حط_أيدي_الشركة_هنا/ban' \\\r\n--header 'Authorization: Bearer {{USER_ACCESS_TOKEN}}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Company",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{USER_ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/companies/69b712f293990409317f6bc4/approve",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "admin",
+                "companies",
+                "69b712f293990409317f6bc4",
+                "approve"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request PATCH '{{baseUrl}}/admin/companies/حط_أيدي_الشركة_هنا/approve' \\\r\n--header 'Authorization: Bearer {{USER_ACCESS_TOKEN}}'"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

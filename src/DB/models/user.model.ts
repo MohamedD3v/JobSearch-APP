@@ -46,7 +46,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop()
+  @Prop({ select: false })
   password?: string;
 
   @Prop({ enum: Providers, required: true })
@@ -91,7 +91,7 @@ export class User {
   @Prop({ type: Date })
   deletedAt?: Date;
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, default: null })
   bannedAt?: Date;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
@@ -106,7 +106,7 @@ export class User {
   @Prop({ type: ImageSchema })
   coverPic?: Image;
 
-  @Prop({ type: [OTPSchema], default: [] })
+  @Prop({ type: [OTPSchema], default: [], select: false })
   OTP: OTP[];
 }
 
@@ -183,4 +183,12 @@ UserSchema.post('save', async function (doc: DocWithOtpCode) {
   }
 
   doc._otpCode = undefined;
+});
+
+UserSchema.pre(['findOneAndDelete', 'deleteOne'], async function () {
+  const user = await this.model.findOne(this.getQuery());
+  if (user) {
+    const ApplicationModel = mongoose.model('Application');
+    await ApplicationModel.deleteMany({ userId: user._id });
+  }
 });

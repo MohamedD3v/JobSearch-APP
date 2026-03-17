@@ -1,100 +1,209 @@
-# Flipris JobSearch APP
+# 🚀 FLIPRIS - Advanced Job Search System
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+FLIPRIS is a comprehensive, professional Job Search platform built with **NestJS**. It provides a robust ecosystem for job seekers to find opportunities, companies to manage listings, and administrators to oversee the platform via a GraphQL dashboard.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🛠️ Tech Stack
 
-## Description
+- **Backend**: [NestJS](https://nestjs.com/) (Node.js framework)
+- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/) ODM
+- **Real-time**: [Socket.IO](https://socket.io/) for instant messaging
+- **Query Language**: [GraphQL](https://graphql.org/) (Apollo Driver) for Admin Dashboard
+- **File Management**: [Cloudinary](https://cloudinary.com/) for media & [ExcelJS](https://github.com/exceljs/exceljs) for data export
+- **Security**: JWT Authentication, Bcrypt hashing, Helmet, and Rate Limiting
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## ✨ Key Features
 
-```bash
-$ npm install
+- **🔐 Robust Authentication**: Email & OTP confirmation, Google OAuth integration, and JWT-based session management.
+- **🏢 Company Management**: Full CRUD for companies, including logo/cover uploads and HR management.
+- **💼 Job Ecosystem**: Advanced job posting, filtering, and application tracking system.
+- **💬 Real-time Chat**: Individual messaging system powered by Socket.IO.
+- **📊 Admin Dashboard**: High-level data overview using GraphQL for efficient querying.
+- **📥 Excel Export**: Generate comprehensive reports of job applications in `.xlsx` format.
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+├── DB/                      # Database models and schema definitions
+├── common/                  # Shared guards, decorators, filters, and services
+│   ├── services/            # Email and Cloudinary integration
+│   └── utils/               # Token and general utilities
+├── modules/                 # Functional modules
+│   ├── Admin/               # GraphQL Resolver and Admin Service
+│   ├── Auth/                # Authentication logic (Signup, Signin, OTP)
+│   ├── Chat/                # Messaging services
+│   ├── Company/             # Company profiles and management
+│   ├── Job/                 # Job listings and logic
+│   ├── Application/         # Job applications and status tracking
+│   ├── Socket/              # Socket.IO Gateway
+│   └── User/                # User profile management
+├── main.ts                  # Application entry point
+└── app.module.ts            # Root module configuration
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## 🚀 Installation & Setup
 
-# watch mode
-$ npm run start:dev
+1. **Clone the repository**:
 
-# production mode
-$ npm run start:prod
+   ```bash
+   git clone <repository-url>
+   cd JobSearch
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**:
+   Create a `.env` file in the root directory and configure the variables (refer to `.env.example`):
+
+   ```env
+   PORT=3000
+   MONGO_URI=your_mongodb_uri
+   JWT_SECRET=your_secret
+   ACCESS_TOKEN_SECRET=your_access_secret
+   REFRESH_TOKEN_SECRET=your_refresh_secret
+   CLOUDINARY_CLOUD_NAME=name
+   CLOUDINARY_API_KEY=key
+   CLOUDINARY_API_SECRET=secret
+   EMAIL=your_email
+   PASS=your_email_password
+   ```
+
+4. **Run the application**:
+
+   ```bash
+   # Development mode
+   npm run start:dev
+
+   # Production mode
+   npm run start:prod
+   ```
+
+---
+
+## 📖 API Documentation
+
+### 🔌 REST Endpoints
+
+| Category    | Method  | Endpoint                          | Description                   |
+### 🔌 REST Endpoints
+
+#### 🔐 Authentication
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/auth/signup` | Register a new user account | Public |
+| `POST` | `/auth/confirm-otp` | Verify email address via OTP | Public |
+| `POST` | `/auth/signin` | Authenticate and receive tokens | Public |
+| `POST` | `/auth/forget-password` | Trigger password reset OTP | Public |
+| `POST` | `/auth/reset-password` | Reset password using OTP | Public |
+| `POST` | `/auth/refresh-token` | Obtain new access token | Public |
+| `POST` | `/auth/resend-otp` | Resend verification OTP | Public |
+| `PUT` | `/auth/update-password` | Update account password | User |
+
+#### 👤 User Profile
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/user/profile` | Get currently logged-in user profile | User |
+| `PATCH` | `/user/profile` | Update profile information | User |
+| `GET` | `/user/profile/:id` | Get public profile of another user | Public |
+| `DELETE` | `/user/account` | Soft delete own account | User |
+| `POST` | `/user/profile-pic` | Upload profile picture | User |
+| `DELETE` | `/user/profile-pic` | Remove profile picture | User |
+| `POST` | `/user/cover-pic` | Upload cover picture | User |
+| `DELETE` | `/user/cover-pic` | Remove cover picture | User |
+
+#### 🏢 Company Management
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/company` | Register a new company | User |
+| `GET` | `/company/search` | Search companies by name | Public |
+| `GET` | `/company/:id` | Get company details & job list | Public |
+| `PATCH` | `/company/:id` | Update company information | Owner |
+| `DELETE` | `/company/:id` | Soft delete company | Owner/Admin |
+| `POST` | `/company/:id/logo` | Upload company logo | Owner |
+| `DELETE` | `/company/:id/logo` | Remove company logo | Owner |
+| `POST` | `/company/:id/cover` | Upload company cover image | Owner |
+| `DELETE` | `/company/:id/cover` | Remove company cover image | Owner |
+
+#### 💼 Job Logic
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/jobs` | Post a new job listing | Owner/HR |
+| `GET` | `/jobs` | Get all jobs with filters | Public |
+| `PATCH` | `/jobs/:id` | Update job details | Owner |
+| `DELETE` | `/jobs/:id` | Remove a job listing | Owner |
+| `GET` | `/jobs/company/:companyId` | Get all jobs for a company | Public |
+| `GET` | `/jobs/company/:companyId/:jobId` | Get specific job details | Public |
+
+#### 📩 Applications
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/jobs/:jobId/apply` | Apply to a job with CV upload | User |
+| `GET` | `/jobs/:jobId/applications` | View applicants for a job | Owner/HR |
+| `PATCH` | `/jobs/applications/:appId/status` | Accept/Reject an application | Owner/HR |
+| `GET` | `/jobs/applications/excel-export` | **Bonus:** Export apps to CSV | Public |
+
+#### 🛡️ Admin Actions
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `PATCH` | `/admin/users/:id/ban` | Toggle ban status for a user | Admin |
+| `PATCH` | `/admin/companies/:id/ban` | Toggle ban status for a company | Admin |
+| `PATCH` | `/admin/companies/:id/approve` | Approve a company profile | Admin |
+
+#### 💬 Chat
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/chat/:userId` | Get chat history with a user | User |
+
+### 📊 GraphQL (Admin Dashboard)
+
+Access the GraphQL playground at `/graphql`.
+
+**Query: Get Dashboard Overview**
+
+```graphql
+query {
+  getDashboardData {
+    users {
+      _id
+      firstName
+      email
+      bannedAt
+    }
+    companies {
+      _id
+      companyName
+      isApproved
+    }
+  }
+}
 ```
 
-## Run tests
+### ⚡ Socket.IO Events
 
-```bash
-# unit tests
-$ npm run test
+**Namespace**: `/` (Default)
 
-# e2e tests
-$ npm run test:e2e
+| Event            | Direction        | Payload                            | Description                 |
+| :--------------- | :--------------- | :--------------------------------- | :-------------------------- |
+| `sendMessage`    | Client -> Server | `{ receiverId, message }`          | Send a real-time message    |
+| `receiveMessage` | Server -> Client | `{ senderId, message, createdAt }` | Receive an incoming message |
+| `newApplication` | Server -> Client | `{ jobTitle, userId }`             | Notification for company HR |
 
-# test coverage
-$ npm run test:cov
-```
+To test the APIs, import the Flipris.postman_collection.json file located in the root folder into your Postman.
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 📄 License
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is [UNLICENSED](LICENSE).
