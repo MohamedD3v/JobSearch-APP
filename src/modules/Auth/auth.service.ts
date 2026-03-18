@@ -118,7 +118,7 @@ export class AuthService {
 
   async signIn(signinDto: SigninDto) {
     const { email, password } = signinDto;
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).select('+password');
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     if (!user.password) {
@@ -327,21 +327,20 @@ export class AuthService {
 
   async updatePassword(userId: string, updatePasswordDto: UpdatePasswordDto) {
     const { oldPassword, newPassword } = updatePasswordDto;
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).select('+password');
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    if (user.provider !== Providers.SYSTEM || !user.password) {
-      throw new BadRequestException(
-        'Cannot update password for non-system accounts',
-      );
-    }
-
-    const isPasswordValid = await compare(oldPassword, user.password);
-    if (!isPasswordValid) {
-      throw new BadRequestException('Invalid old password');
+    if (user.password) {
+      if (!oldPassword) {
+        throw new BadRequestException('Old password is required');
+      }
+      const isPasswordValid = await compare(oldPassword, user.password);
+      if (!isPasswordValid) {
+        throw new BadRequestException('Invalid old password');
+      }
     }
 
     user.password = newPassword;
