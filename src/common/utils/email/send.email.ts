@@ -7,7 +7,6 @@ export const sendEmail = async (data: MailOptions) => {
   if (!data.html && !data.attachments?.length && !data.text)
     throw new BadRequestException('Please insert Data');
   const transporter = createTransport({
-    service: 'gmail',
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
