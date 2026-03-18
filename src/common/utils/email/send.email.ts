@@ -8,6 +8,9 @@ export const sendEmail = async (data: MailOptions) => {
     throw new BadRequestException('Please insert Data');
   const transporter = createTransport({
     service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASS,

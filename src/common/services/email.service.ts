@@ -9,11 +9,15 @@ export class EmailService {
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: this.configService.get<string>('EMAIL'),
         pass: this.configService.get<string>('PASS'),
       },
-    });
+      family: 4,
+    } as any);
   }
 
   async sendEmail(to: string, subject: string, html: string) {
