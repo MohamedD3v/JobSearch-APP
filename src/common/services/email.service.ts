@@ -1,35 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
-import type SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
-  private transporter;
+  private resend: Resend;
 
   constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: this.configService.get<string>('EMAIL'),
-        pass: this.configService.get<string>('PASS'),
-      },
-      family: 4,
-    } as SMTPTransport.Options);
+    this.resend = new Resend(this.configService.get<string>('RESEND_API_KEY'));
   }
 
   async sendEmail(to: string, subject: string, html: string) {
-    const mailOptions = {
-      from: `Job Search APP <${this.configService.get<string>('EMAIL')}>`,
-      to,
-      subject,
-      html,
-    };
-
     try {
-      await this.transporter.sendMail(mailOptions);
+      await this.resend.emails.send({
+        from: 'JobApp <onboarding@resend.dev>',
+        to,
+        subject,
+        html,
+      });
       return true;
     } catch {
       return false;

@@ -209,7 +209,7 @@ export class AuthService {
 
   async forgetPassword(forgetPasswordDto: ForgetPasswordDto) {
     const { email } = forgetPasswordDto;
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).select('+OTP');
     if (!user) throw new NotFoundException('User not found');
 
     const otpCode = generateOtp();
@@ -232,7 +232,7 @@ export class AuthService {
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { email, otpCode, newPassword } = resetPasswordDto;
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).select('+OTP');
     if (!user) throw new NotFoundException('User not found');
 
     const otpIndex = user.OTP.findIndex(
@@ -300,7 +300,7 @@ export class AuthService {
 
   async resendOtp(resendOtpDto: ResendOtpDto) {
     const { email, type } = resendOtpDto;
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).select('+OTP');
     if (!user) throw new NotFoundException('User not found');
 
     if (type === OTPTypes.CONFIRM_EMAIL && user.isConfirmed) {

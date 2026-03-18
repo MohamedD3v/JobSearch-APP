@@ -1,24 +1,17 @@
 import { BadRequestException } from '@nestjs/common';
-import { createTransport } from 'nodemailer';
-import type SMTPTransport from 'nodemailer/lib/smtp-transport';
-import type { MailOptions } from 'nodemailer/lib/sendmail-transport';
+import { Resend } from 'resend';
 
-export const sendEmail = async (data: MailOptions) => {
-  if (!data.html && !data.attachments?.length && !data.text)
+export const sendEmail = async (data: any) => {
+  if (!data.html && !data.text)
     throw new BadRequestException('Please insert Data');
-  const transporter = createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASS,
-    },
-    family: 4,
-  } as SMTPTransport.Options);
-  await transporter.sendMail({
-    ...data,
-    from: `"Job Search App" <${process.env.EMAIL}>`,
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  await resend.emails.send({
+    from: 'JobApp <onboarding@resend.dev>',
     to: data.to,
+    subject: data.subject,
+    html: data.html,
+    text: data.text,
   });
 };
