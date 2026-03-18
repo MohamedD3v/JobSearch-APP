@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
-import { createTransport, TransportOptions } from 'nodemailer';
+import { createTransport } from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 import type { MailOptions } from 'nodemailer/lib/sendmail-transport';
 
 export const sendEmail = async (data: MailOptions) => {
@@ -12,7 +13,7 @@ export const sendEmail = async (data: MailOptions) => {
       pass: process.env.PASS,
     },
     family: 4,
-  } as TransportOptions);
+  } as SMTPTransport.Options);
   await transporter.sendMail({
     ...data,
     from: `"Job Search App" <${process.env.EMAIL}>`,

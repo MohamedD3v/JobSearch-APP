@@ -85,7 +85,7 @@ export class AuthService {
 
   async confirmOtp(confirmOtpDto: ConfirmOtpDto) {
     const { email, otpCode } = confirmOtpDto;
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).select('+OTP');
     if (!user) throw new NotFoundException('User not found');
 
     if (!user.OTP || user.OTP.length === 0) {
@@ -120,6 +120,10 @@ export class AuthService {
     const { email, password } = signinDto;
     const user = await this.userModel.findOne({ email });
     if (!user) throw new UnauthorizedException('Invalid credentials');
+
+    if (!user.password) {
+      throw new UnauthorizedException('Please use social login');
+    }
 
     if (user.provider !== Providers.SYSTEM) {
       throw new UnauthorizedException('Please login with your provider');
