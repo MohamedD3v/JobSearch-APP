@@ -68,34 +68,28 @@ export class ApplicationController {
   }
 
   @Get('applications/excel-export')
-  async exportApplicationsToCsv(
+  @UseGuards(AuthGuard)
+  async exportApplicationsToExcel(
     @Query('companyId') companyId: string,
     @Query('date') date: string,
+    @Req() req: any,
     @Res() res: Response,
   ) {
-    const applications = await this.applicationService.getApplicationsForExcel(
+    const buffer = await this.applicationService.getApplicationsForExcel(
       companyId,
       date,
+      req.user._id as string,
     );
 
-    let csvString = 'Applicant Name,Email,Job Title,Status,Applied At\n';
-
-    applications.forEach((app: any) => {
-      const applicantName = `${app.userId.firstName} ${app.userId.lastName}`;
-      const email = app.userId.email;
-      const jobTitle = app.jobId.jobTitle;
-      const status = app.status;
-      const appliedAt = app.createdAt.toISOString();
-
-      csvString += `${applicantName},${email},${jobTitle},${status},${appliedAt}\n`;
-    });
-
-    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename=applications_report.csv',
+      'attachment; filename=applications_report.xlsx',
     );
 
-    return res.status(200).send(csvString);
+    return res.status(200).send(buffer);
   }
 }

@@ -19,6 +19,8 @@ async function bootstrap() {
   });
 
   app.use(helmet());
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,

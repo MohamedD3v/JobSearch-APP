@@ -88,6 +88,10 @@ export class AuthService {
     const user = await this.userModel.findOne({ email });
     if (!user) throw new NotFoundException('User not found');
 
+    if (!user.OTP || user.OTP.length === 0) {
+      throw new BadRequestException('No OTP codes found for this user');
+    }
+
     const otpIndex = user.OTP.findIndex(
       (otp) => otp.type === OTPTypes.CONFIRM_EMAIL,
     );

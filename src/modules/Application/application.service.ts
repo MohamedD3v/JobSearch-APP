@@ -4,6 +4,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { Workbook } from 'exceljs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -144,20 +145,39 @@ export class ApplicationService {
     };
   }
 
-  async getApplicationsForExcel(companyId: string, date: string) {
+  async getApplicationsForExcel(
+    companyId: string,
+    date: string,
+    userId: string,
+  ) {
     if (!date || isNaN(new Date(date).getTime())) {
       throw new BadRequestException(
         'Invalid date provided. Please provide a valid date string (e.g., YYYY-MM-DD).',
       );
     }
-    const jobs = await this.jobModel.find({ companyId });
-    const jobIds = jobs.map((job) => job._id);
+
+    const company = await this.companyModel.findById(companyId);
+    if (!company) throw new NotFoundException('Company not found');
+
+    const isOwner = company.CreatedBy.toString() === userId.toString();
+    const isHR = company.HRs.some(
+      (hrId) => hrId.toString() === userId.toString(),
+    );
+
+    if (!isOwner && !isHR) {
+      throw new ForbiddenException(
+        'Only Company Owner or HR can access applications',
+      );
+    }
 
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
+
+    const jobs = await this.jobModel.find({ companyId });
+    const jobIds = jobs.map((job) => job._id);
 
     const applications = await this.applicationModel
       .find({
@@ -167,6 +187,34 @@ export class ApplicationService {
       .populate('userId', 'firstName lastName email')
       .populate('jobId', 'jobTitle');
 
-    return applications;
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet('Applications');
+
+    worksheet.columns = [
+      { header: 'Applicant Name', key: 'name', width: 25 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Job Title', key: 'jobTitle', width: 25 },
+      { header: 'Status', key: 'status', width: 15 },
+      { header: 'Applied At', key: 'createdAt', width: 20 },
+      { header: 'CV URL', key: 'cvUrl', width: 50 },
+    ];
+
+    applications.forEach((app: any) => {
+      worksheet.addRow({
+        name: `${app.userId.firstName} ${app.userId.lastName}`,
+        email: app.userId.email,
+        jobTitle: app.jobId.jobTitle,
+        status: app.status,
+        createdAt: app.createdAt.toISOString(),
+        cvUrl: app.userCV?.secure_url || 'N/A',
+      });
+    });
+
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer as any;
   }
 }
